@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+<meta name="theme-color" content="#1f3a5f" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="Big Skills" />
+<meta name="mobile-web-app-capable" content="yes" />
+<title>Big Skills for Little Ones</title>
+<style>
+  :root{
+    --bg:#eaf6ff; --bg2:#d7eefc; --card:#ffffff; --ink:#2b3440; --muted:#6b7688;
+    --brand:#1f3a5f; --accent:#c0392b; --sun:#f4b942; --green:#3ea55f; --green-d:#2e7d32;
+    --pink:#e86a8e; --purple:#8e6fc4; --line:#e3ebf2; --shadow:0 8px 24px rgba(31,58,95,.12);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    margin:0;background:linear-gradient(180deg,var(--bg),var(--bg2));color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0);
+    overflow-x:hidden;
+  }
+  .app{max-width:520px;margin:0 auto;min-height:100%;position:relative}
+  .screen{display:none;padding:16px 16px 90px;animation:fade .25s ease}
+  .screen.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* Top bar */
+  .top{display:flex;align-items:center;gap:10px;padding:10px 4px 14px}
+  .top .back{background:var(--card);border:1px solid var(--line);border-radius:12px;width:40px;height:40px;font-size:20px;color:var(--brand);box-shadow:var(--shadow);cursor:pointer}
+  .top h2{font-size:19px;margin:0;color:var(--brand);flex:1}
+  .brand-mini{font-weight:800;letter-spacing:2px;color:var(--brand);font-size:13px}
+
+  /* Home / garden */
+  .hero{text-align:center;padding:8px 10px 4px}
+  .hero .title{font-size:30px;font-weight:900;line-height:1.05;margin:6px 0}
+  .hero .title b{color:var(--brand)} .c1{color:var(--accent)}.c2{color:var(--green)}.c3{color:var(--purple)}.c4{color:var(--sun)}.c5{color:var(--pink)}
+  .hero .sub{color:var(--muted);font-size:14px;margin:2px 0 6px}
+  .progresswrap{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:16px;margin:10px 4px}
+  .pbar{height:14px;background:#eef3f7;border-radius:999px;overflow:hidden;margin:8px 0}
+  .pfill{height:100%;background:linear-gradient(90deg,var(--green),var(--sun));width:0;transition:width .5s ease}
+  .pmeta{display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}
+  .garden{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;min-height:60px;margin-top:12px}
+  .bloom{font-size:26px;filter:grayscale(1) opacity(.28);transition:.4s;transform:scale(.9)}
+  .bloom.on{filter:none;transform:scale(1)}
+  .cta{display:block;width:100%;border:none;border-radius:16px;padding:16px;font-size:17px;font-weight:800;color:#fff;background:linear-gradient(90deg,var(--brand),#2a568a);box-shadow:var(--shadow);cursor:pointer;margin:8px 0}
+
+  /* Section grid */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+  .seccard{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:16px;cursor:pointer;position:relative;overflow:hidden;transition:transform .12s}
+  .seccard:active{transform:scale(.97)}
+  .seccard .emoji{font-size:30px}
+  .seccard .name{font-weight:800;margin-top:6px;font-size:15px;color:var(--brand);line-height:1.2}
+  .seccard .count{font-size:12px;color:var(--muted);margin-top:2px}
+  .seccard .tick{position:absolute;top:10px;right:10px;font-size:16px}
+  .locked{opacity:.55}
+  .badge{position:absolute;top:0;left:0;background:var(--sun);color:#5b4300;font-size:10px;font-weight:800;padding:3px 8px;border-bottom-right-radius:10px;letter-spacing:.5px}
+
+  /* Skill list */
+  .skill-row{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:14px;margin-bottom:10px;cursor:pointer}
+  .skill-row:active{transform:scale(.99)}
+  .skill-row .n{width:34px;height:34px;border-radius:10px;background:var(--bg2);color:var(--brand);font-weight:800;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+  .skill-row .t{flex:1;font-weight:700;font-size:15px}
+  .skill-row .s{font-size:18px}
+
+  /* Skill detail */
+  .illus{width:100%;border-radius:18px;border:1px solid var(--line);box-shadow:var(--shadow);display:block;background:#f3f7fb}
+  .illus-ph{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;flex-direction:column;color:var(--muted);text-align:center;padding:20px}
+  .illus-ph .big{font-size:64px}
+  .part{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:16px;margin:12px 0}
+  .part h3{margin:0 0 6px;font-size:14px;letter-spacing:.5px;text-transform:uppercase;color:var(--green-d)}
+  .part.story h3{color:var(--brand)}
+  .part p{margin:6px 0;font-size:16px;line-height:1.6}
+  .speaker{display:inline-flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--line);color:var(--brand);border-radius:999px;padding:9px 16px;font-weight:700;font-size:14px;cursor:pointer;margin-bottom:4px}
+  .speaker.playing{background:var(--sun);color:#5b4300;border-color:var(--sun)}
+  .do-btn{display:inline-block;background:var(--green);color:#fff;border:none;border-radius:12px;padding:10px 16px;font-weight:700;font-size:14px;cursor:pointer;margin-top:6px}
+  .talk{background:linear-gradient(0deg,#fff7ec,#fff);border-color:#f0dcae}
+  .talk h3{color:#b9781a}
+  .remember{background:linear-gradient(0deg,#fdeef0,#fff);border-color:#f2c9d1;text-align:center}
+  .remember p{font-style:italic;font-weight:700;color:var(--accent)}
+  .complete-btn{width:100%;border:none;border-radius:16px;padding:16px;font-size:17px;font-weight:800;color:#fff;background:linear-gradient(90deg,var(--green),var(--green-d));box-shadow:var(--shadow);cursor:pointer;margin:6px 0}
+  .complete-btn.done{background:linear-gradient(90deg,#9bb3c4,#7f97a9)}
+
+  /* Bloom celebration */
+  .celebrate{position:fixed;inset:0;background:rgba(20,30,45,.55);display:none;align-items:center;justify-content:center;z-index:50;padding:24px}
+  .celebrate.show{display:flex}
+  .celebrate .box{background:#fff;border-radius:22px;padding:28px;text-align:center;max-width:340px;animation:pop .35s ease}
+  @keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+  .celebrate .grow{font-size:70px}
+  .celebrate h3{color:var(--brand);margin:6px 0}
+  .celebrate p{color:var(--muted);margin:4px 0 14px}
+  .celebrate button{background:var(--brand);color:#fff;border:none;border-radius:12px;padding:12px 22px;font-weight:800;font-size:15px;cursor:pointer}
+
+  /* Bottom nav */
+  .nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;max-width:520px;margin:0 auto;padding-bottom:env(safe-area-inset-bottom,0)}
+  .nav button{flex:1;background:none;border:none;padding:10px 0 12px;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer}
+  .nav button .i{font-size:20px;display:block}
+  .nav button.on{color:var(--brand)}
+
+  /* Certificate */
+  .cert{background:#fffdf5;border:3px solid var(--sun);border-radius:18px;padding:22px 18px;text-align:center;box-shadow:var(--shadow)}
+  .cert .rib{font-size:34px}
+  .cert h3{color:var(--brand);font-size:22px;margin:6px 0}
+  .cert .nm{border-bottom:2px solid var(--brand);min-height:30px;font-size:20px;font-weight:800;color:var(--accent);margin:14px 20px;padding:4px}
+  .cert input{width:100%;border:none;border-bottom:2px solid var(--brand);text-align:center;font-size:20px;font-weight:800;color:var(--accent);background:none;padding:6px 0;font-family:inherit}
+  .cert input:focus{outline:none}
+  .cert .afsr{font-weight:800;letter-spacing:2px;color:var(--brand);margin-top:14px}
+
+  /* Parental gate */
+  .gate{position:fixed;inset:0;background:rgba(20,30,45,.6);display:none;align-items:center;justify-content:center;z-index:60;padding:24px}
+  .gate.show{display:flex}
+  .gate .box{background:#fff;border-radius:20px;padding:26px;max-width:320px;text-align:center}
+  .gate h3{color:var(--brand);margin:0 0 4px}
+  .gate p{color:var(--muted);font-size:14px;margin:6px 0 14px}
+  .gate .q{font-size:22px;font-weight:800;margin:8px 0}
+  .gate input{width:120px;text-align:center;font-size:22px;padding:8px;border:2px solid var(--line);border-radius:12px;font-family:inherit}
+  .gate .row{display:flex;gap:8px;margin-top:14px}
+  .gate .row button{flex:1;border:none;border-radius:12px;padding:12px;font-weight:700;cursor:pointer}
+  .gate .ok{background:var(--brand);color:#fff}.gate .no{background:#eef3f7;color:var(--muted)}
+  .note{font-size:11px;color:var(--muted);text-align:center;margin-top:10px;padding:0 10px}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============ HOME / GARDEN ============ -->
+  <section id="home" class="screen active">
+    <div class="hero">
+      <div class="brand-mini">AFSR</div>
+      <div class="title"><b>Big</b> <span class="c1">Skills</span><br><span class="c2">for</span> <span class="c3">little</span> <span class="c4">ones</span></div>
+      <div class="sub">75 big skills to grow by 🌱</div>
+    </div>
+
+    <div class="progresswrap">
+      <div style="font-weight:800;color:var(--brand)">🌳 My Skill Garden</div>
+      <div class="pbar"><div class="pfill" id="pfill"></div></div>
+      <div class="pmeta"><span id="pcount">0 of 75 skills grown</span><span id="ppct">0%</span></div>
+      <div class="garden" id="garden"></div>
+    </div>
+
+    <button class="cta" onclick="go('sections')">Start Growing →</button>
+    <p class="note">🔒 No ads · No logins · No data collected · Works offline<br><a href="privacy.html" style="color:var(--brand);font-weight:700">Privacy Policy &amp; FAQ</a></p>
+  </section>
+
+  <!-- ============ SECTIONS ============ -->
+  <section id="sections" class="screen">
+    <div class="top"><button class="back" onclick="go('home')">←</button><h2>Pick a World</h2></div>
+    <div class="grid" id="secgrid"></div>
+  </section>
+
+  <!-- ============ SKILL LIST ============ -->
+  <section id="skills" class="screen">
+    <div class="top"><button class="back" onclick="go('sections')">←</button><h2 id="skillsTitle">Section</h2></div>
+    <div id="skillList"></div>
+  </section>
+
+  <!-- ============ SKILL DETAIL ============ -->
+  <section id="skill" class="screen">
+    <div class="top"><button class="back" onclick="go('skills')">←</button><h2 id="skTitle">Skill</h2></div>
+    <div id="skBody"></div>
+  </section>
+
+  <!-- ============ CERTIFICATE ============ -->
+  <section id="cert" class="screen">
+    <div class="top"><button class="back" onclick="go('home')">←</button><h2>My Certificate</h2></div>
+    <div class="cert">
+      <div class="rib">🏆</div>
+      <h3>Certificate of Big Skills</h3>
+      <p style="color:var(--muted);margin:2px 0">This certifies that</p>
+      <input id="certName" placeholder="✏️ type your name" />
+      <p style="font-size:14px;margin:12px 6px">has been growing big skills to be kinder, braver, smarter, safer, and wonderfully themselves!</p>
+      <div class="afsr">AFSR</div>
+      <div style="font-size:11px;color:var(--muted)">Little Learners. Brighter Tomorrows.</div>
+    </div>
+    <div id="saveMsg" style="text-align:center;color:var(--green-d);font-weight:700;font-size:13px;min-height:18px;margin-top:8px"></div>
+    <button class="cta" style="background:linear-gradient(90deg,var(--green),var(--green-d))" onclick="saveCertImage()">📥 Save my certificate</button>
+    <button class="cta" style="background:linear-gradient(90deg,var(--purple),#6f52a8)" onclick="shareCert()">📤 Share</button>
+    <p class="note">Your name is kept on this device. Tap “Save my certificate” to download it as a picture you can keep or print. In the full app it fills in automatically when all 75 skills are grown, and a grown-up can sign it. 🌟</p>
+  </section>
+
+  <!-- ============ PARENT CORNER ============ -->
+  <section id="parent" class="screen">
+    <div class="top"><button class="back" onclick="go('home')">←</button><h2>Parent Corner</h2></div>
+    <div class="part"><h3>Progress</h3><p id="parentProg">0 of 75 skills grown together.</p></div>
+    <div class="part talk"><h3>💬 Why "talk about it" matters</h3><p>The lessons stick best when you chat about them. Each skill has a gentle question to ask your child — turning a story into a real conversation.</p></div>
+    <div class="part"><h3>🔒 Privacy</h3><p>This app collects <b>no data</b> — no names, no location, no tracking. Everything stays on this device. The read-aloud uses your device's own voice and never records anything.</p></div>
+    <div class="part"><h3>🔤 Read-aloud</h3><p>Tap the speaker on any skill to have the story read aloud — perfect for pre-readers. Leave it off for children practising reading. Completely optional.</p></div>
+    <button class="cta" onclick="resetProgress()" style="background:linear-gradient(90deg,#b0483c,#c0392b)">Reset progress (demo)</button>
+  </section>
+
+  <!-- Bottom nav -->
+  <nav class="nav">
+    <button id="nav-home" class="on" onclick="go('home')"><span class="i">🏡</span>Home</button>
+    <button id="nav-sections" onclick="go('sections')"><span class="i">🌍</span>Worlds</button>
+    <button id="nav-cert" onclick="go('cert')"><span class="i">🏆</span>Certificate</button>
+    <button id="nav-parent" onclick="parentGate()"><span class="i">👪</span>Parents</button>
+  </nav>
+
+  <!-- Celebrate modal -->
+  <div class="celebrate" id="celebrate">
+    <div class="box">
+      <div class="grow" id="celebEmoji">🌱</div>
+      <h3>You grew a skill! 🎉</h3>
+      <p id="celebText">Your garden is blooming.</p>
+      <button onclick="closeCelebrate()">Yay! Keep growing</button>
+    </div>
+  </div>
+
+  <!-- Parental gate -->
+  <div class="gate" id="gate">
+    <div class="box">
+      <h3>👪 Grown-ups only</h3>
+      <p>Please answer to continue.</p>
+      <div class="q" id="gateQ">3 + 4 = ?</div>
+      <input id="gateA" type="number" inputmode="numeric" />
+      <div class="row"><button class="no" onclick="closeGate()">Cancel</button><button class="ok" onclick="checkGate()">Enter</button></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ---------------- DATA (sample content; full app loads all 75) ---------------- */
+const SECTIONS = [
+  {id:1,emoji:"❤️",name:"A Kind Heart",count:6,sample:true},
+  {id:2,emoji:"🦁",name:"Brave & Confident",count:6},
+  {id:3,emoji:"😊",name:"My Big Feelings",count:6},
+  {id:4,emoji:"🤝",name:"Making Friends",count:6},
+  {id:5,emoji:"🔍",name:"A Curious Mind",count:5},
+  {id:6,emoji:"🌅",name:"Good Habits Every Day",count:10},
+  {id:7,emoji:"✅",name:"Being Responsible",count:10},
+  {id:8,emoji:"🛡️",name:"Staying Safe & Smart",count:16},
+  {id:9,emoji:"✨",name:"Being Wonderfully You",count:10},
+];
+
+/* One fully-written sample skill (Skill 1) + light stubs so the list feels real */
+const SKILLS = {
+ 1:[
+  {id:1,emoji:"🤗",title:"Being Kind",full:true,
+   hook:"Have you ever made someone smile… and felt your own heart get warm too? That little glow has a name. It's called kindness.",
+   story:"Leo was walking to the swings when he saw a girl sitting alone on the steps, hugging her knees. Nobody was playing with her. Leo almost kept walking — the swings were free! But something inside him tugged. So he stopped, sat down beside her, and said, \u201CHi. Want to be swing buddies?\u201D The girl looked up, surprised… and then she smiled the biggest smile. The funny thing? Leo felt happy too — even happier than if he'd gone straight to the swings. Kindness is like that. When you give it away, you get some back.",
+   activity:"Look around you right now. Can you spot one person you could be kind to today? Think of one small kind thing you could do — a smile, a hug, or kind words.",
+   trythis:"This week, do one tiny kind thing every day — and no one has to tell you to! See how many smiles you can grow.",
+   talk:"Ask your child: \u201CWhen did someone do something kind for you? How did it feel?\u201D",
+   remember:"A little kindness makes a big, warm difference."},
+  {id:2,emoji:"🎨",title:"Sharing",stub:true},
+  {id:3,emoji:"🙌",title:"Helping Others",stub:true},
+  {id:4,emoji:"💗",title:"Saying \u201CI'm Sorry\u201D",stub:true},
+  {id:5,emoji:"🙏",title:"Gratitude & \u201CThank You\u201D",stub:true},
+  {id:6,emoji:"🌈",title:"Including Everyone",stub:true},
+ ]
+};
+
+/* ---------------- STATE (saved locally on device only) ---------------- */
+let done = {};
+try { done = JSON.parse(localStorage.getItem('bs_done')||'{}'); } catch(e){ done={}; }
+function save(){ try{ localStorage.setItem('bs_done', JSON.stringify(done)); }catch(e){} }
+const TOTAL = 75;
+function doneCount(){ return Object.keys(done).length; }
+
+/* ---------------- NAV ---------------- */
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('on'));
+  const map={home:'nav-home',sections:'nav-sections',cert:'nav-cert',parent:'nav-parent'};
+  if(map[id]) document.getElementById(map[id]).classList.add('on');
+  window.scrollTo(0,0);
+  if(id==='home') renderHome();
+  if(id==='sections') renderSections();
+  if(id==='cert') renderCert();
+  if(id==='parent') document.getElementById('parentProg').textContent = doneCount()+" of "+TOTAL+" skills grown together.";
+  stopSpeak();
+}
+
+/* ---------------- HOME ---------------- */
+function renderHome(){
+  const c=doneCount(), pct=Math.round(c/TOTAL*100);
+  document.getElementById('pfill').style.width=pct+'%';
+  document.getElementById('pcount').textContent=c+' of '+TOTAL+' skills grown';
+  document.getElementById('ppct').textContent=pct+'%';
+  const g=document.getElementById('garden'); g.innerHTML='';
+  const flowers=['🌸','🌻','🌷','🌼','🌹','🪻','💐','🌺'];
+  const show=Math.max(8,c);
+  for(let i=0;i<show;i++){
+    const s=document.createElement('span');
+    s.className='bloom'+(i<c?' on':'');
+    s.textContent=flowers[i%flowers.length];
+    g.appendChild(s);
+  }
+}
+
+/* ---------------- SECTIONS ---------------- */
+function renderSections(){
+  const grid=document.getElementById('secgrid'); grid.innerHTML='';
+  SECTIONS.forEach(sec=>{
+    const el=document.createElement('div');
+    el.className='seccard'+(sec.sample?'':' locked');
+    const secDone = countSectionDone(sec.id);
+    el.innerHTML = (sec.sample?'<div class="badge">DEMO</div>':'')+
+      '<div class="emoji">'+sec.emoji+'</div>'+
+      '<div class="name">'+sec.name+'</div>'+
+      '<div class="count">'+secDone+' / '+sec.count+' skills</div>'+
+      (sec.sample?'':'<div class="tick">🔒</div>');
+    el.onclick=()=>{ if(sec.sample){ openSection(sec);} else { alert('This world unlocks in the full app 🌟\\nThe demo shows Section 1.'); } };
+    grid.appendChild(el);
+  });
+}
+function countSectionDone(secId){
+  const arr=SKILLS[secId]||[]; let n=0; arr.forEach(s=>{ if(done[secId+'-'+s.id]) n++; }); return n;
+}
+
+/* ---------------- SKILL LIST ---------------- */
+let currentSection=null;
+function openSection(sec){
+  currentSection=sec;
+  document.getElementById('skillsTitle').textContent=sec.emoji+' '+sec.name;
+  const list=document.getElementById('skillList'); list.innerHTML='';
+  (SKILLS[sec.id]||[]).forEach(sk=>{
+    const row=document.createElement('div'); row.className='skill-row';
+    const isDone=done[sec.id+'-'+sk.id];
+    row.innerHTML='<div class="n">'+sk.id+'</div><div class="t">'+sk.emoji+' '+sk.title+'</div><div class="s">'+(isDone?'🌟':'›')+'</div>';
+    row.onclick=()=>openSkill(sec,sk);
+    list.appendChild(row);
+  });
+  go('skills');
+}
+
+/* ---------------- SKILL DETAIL ---------------- */
+let currentSkill=null;
+function openSkill(sec,sk){
+  currentSkill={sec,sk};
+  document.getElementById('skTitle').textContent='Skill '+sk.id;
+  const b=document.getElementById('skBody');
+  if(sk.stub){
+    b.innerHTML='<div class="illus illus-ph"><div class="big">'+sk.emoji+'</div><div>'+sk.title+'</div></div>'+
+      '<div class="part"><p style="text-align:center;color:var(--muted)">This is a preview tile. In the full app, every one of the 75 skills has its own story, picture, activity, and Try This — just like the sample.</p></div>'+
+      '<button class="cta" onclick="openSkill(currentSection, SKILLS[1][0])">See the finished sample skill →</button>';
+    go('skill'); return;
+  }
+  const key=sec.id+'-'+sk.id, isDone=!!done[key];
+  b.innerHTML =
+    '<div class="illus illus-ph"><div class="big">'+sk.emoji+'</div><div>[ Skill illustration ]</div><div style="font-size:12px">(your book\u2019s picture goes here)</div></div>'+
+    '<div class="part story"><button class="speaker" id="spk" onclick="toggleSpeak()">🔊 Read this to me</button>'+
+      '<h3>Hook</h3><p>'+sk.hook+'</p>'+
+      '<h3 style="margin-top:12px">Story</h3><p id="storyText">'+sk.story+'</p></div>'+
+    '<div class="part"><h3>✦ Activity</h3><p>'+sk.activity+'</p><button class="do-btn" onclick="this.textContent=\'✓ Done!\';this.style.opacity=.7">I did it</button></div>'+
+    '<div class="part"><h3>✦ Try This</h3><p>'+sk.trythis+'</p></div>'+
+    '<div class="part talk"><h3>💬 Talk about it together</h3><p>'+sk.talk+'</p></div>'+
+    '<div class="part remember"><p>💛 '+sk.remember+'</p></div>'+
+    '<button class="complete-btn'+(isDone?' done':'')+'" id="completeBtn" onclick="completeSkill()">'+(isDone?'✓ Skill grown':'🌱 I grew this skill!')+'</button>';
+  go('skill');
+}
+
+/* ---------------- COMPLETE + BLOOM ---------------- */
+function completeSkill(){
+  if(!currentSkill) return;
+  const {sec,sk}=currentSkill, key=sec.id+'-'+sk.id;
+  if(done[key]) return;
+  done[key]=true; save();
+  document.getElementById('completeBtn').textContent='✓ Skill grown';
+  document.getElementById('completeBtn').classList.add('done');
+  const flowers=['🌸','🌻','🌷','🌼','🌹','🌺'];
+  document.getElementById('celebEmoji').textContent=flowers[Math.floor(Math.random()*flowers.length)];
+  document.getElementById('celebText').textContent='You\u2019ve grown '+doneCount()+' of 75 skills!';
+  document.getElementById('celebrate').classList.add('show');
+}
+function closeCelebrate(){ document.getElementById('celebrate').classList.remove('show'); }
+
+/* ---------------- READ ALOUD (device voice, no data) ---------------- */
+/* Mobile-safe: preload voices, unlock on first tap, pick a good voice, warn if muted */
+let speaking=false, voicesReady=false, chosenVoice=null, speakUnlocked=false;
+
+function loadVoices(){
+  if(!('speechSynthesis' in window)) return;
+  const vs=window.speechSynthesis.getVoices();
+  if(vs && vs.length){
+    voicesReady=true;
+    // prefer an English, friendly-sounding voice
+    chosenVoice = vs.find(v=>/en[-_]?(US|GB|IN)/i.test(v.lang) && /female|samantha|karen|moira|tessa|zira|google/i.test(v.name))
+              || vs.find(v=>/^en/i.test(v.lang))
+              || vs[0];
+  }
+}
+if('speechSynthesis' in window){
+  loadVoices();
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+}
+
+function toggleSpeak(){
+  if(!('speechSynthesis' in window)){
+    alert('Read-aloud isn\u2019t supported on this browser. It works best on phones and tablets (Chrome / Safari).');
+    return;
+  }
+  if(speaking){ stopSpeak(); return; }
+
+  // iOS/Safari: the first user tap must "unlock" speech with a tiny silent utterance
+  if(!speakUnlocked){
+    try{
+      const warm=new SpeechSynthesisUtterance(' ');
+      warm.volume=0; window.speechSynthesis.speak(warm);
+      speakUnlocked=true;
+    }catch(e){}
+  }
+
+  // voices sometimes aren't ready on the very first tap — try to load now
+  if(!voicesReady) loadVoices();
+
+  const sk=currentSkill.sk;
+  const text=sk.hook+'  '+sk.story;
+  const u=new SpeechSynthesisUtterance(text);
+  if(chosenVoice) u.voice=chosenVoice;
+  u.lang=(chosenVoice&&chosenVoice.lang)||'en-US';
+  u.rate=0.92; u.pitch=1.05; u.volume=1;
+  u.onstart=()=>setSpeakUI(true);
+  u.onend=()=>stopSpeak();
+  u.onerror=()=>stopSpeak();
+
+  window.speechSynthesis.cancel();
+  // small delay helps Safari after the warm-up utterance
+  setTimeout(()=>{ try{ window.speechSynthesis.speak(u); }catch(e){} }, 60);
+
+  setSpeakUI(true);
+  // If nothing started after ~1.2s, it's almost always the phone being on silent
+  setTimeout(()=>{
+    if(speaking && !window.speechSynthesis.speaking){
+      stopSpeak();
+      alert('🔈 No sound? Please check your phone isn\u2019t on Silent/Mute, then tap again.\\n\\n(The read-aloud uses your device\u2019s own voice — nothing is recorded.)');
+    }
+  }, 1200);
+}
+function setSpeakUI(on){
+  speaking=on;
+  const b=document.getElementById('spk');
+  if(b){ b.textContent = on ? '⏸ Stop reading' : '🔊 Read this to me'; b.classList.toggle('playing',on); }
+}
+function stopSpeak(){
+  if('speechSynthesis' in window) window.speechSynthesis.cancel();
+  setSpeakUI(false);
+}
+
+/* ---------------- CERTIFICATE ---------------- */
+function renderCert(){
+  try{ const n=localStorage.getItem('bs_name'); if(n) document.getElementById('certName').value=n; }catch(e){}
+}
+document.addEventListener('input',e=>{
+  if(e.target && e.target.id==='certName'){
+    try{localStorage.setItem('bs_name',e.target.value);}catch(_){}
+    const m=document.getElementById('saveMsg'); if(m){ m.textContent='✓ Name saved on this device'; setTimeout(()=>{if(m)m.textContent='';},1600); }
+  }
+});
+
+/* Draw the certificate to a canvas and let the user download it as a real image */
+function buildCertCanvas(){
+  const name=(document.getElementById('certName').value||'').trim() || 'My Name';
+  const W=1000,H=1300, c=document.createElement('canvas'); c.width=W;c.height=H;
+  const x=c.getContext('2d');
+  // background
+  x.fillStyle='#fffdf5'; x.fillRect(0,0,W,H);
+  // border
+  x.strokeStyle='#f4b942'; x.lineWidth=16; x.strokeRect(28,28,W-56,H-56);
+  x.strokeStyle='#1f3a5f'; x.lineWidth=3; x.strokeRect(52,52,W-104,H-104);
+  x.textAlign='center';
+  x.fillStyle='#f4b942'; x.font='90px serif'; x.fillText('🏆',W/2,180);
+  x.fillStyle='#1f3a5f'; x.font='bold 58px Georgia,serif'; x.fillText('Certificate of Big Skills',W/2,270);
+  x.fillStyle='#6b7688'; x.font='30px Georgia,serif'; x.fillText('This certifies that',W/2,360);
+  // name
+  x.fillStyle='#c0392b'; x.font='bold 64px Georgia,serif'; x.fillText(name,W/2,460);
+  x.strokeStyle='#1f3a5f'; x.lineWidth=3; x.beginPath(); x.moveTo(200,490); x.lineTo(W-200,490); x.stroke();
+  // body (wrapped)
+  x.fillStyle='#2b3440'; x.font='34px Georgia,serif';
+  const lines=['has been growing big skills to be','kinder, braver, smarter, safer,','and wonderfully themselves!'];
+  lines.forEach((ln,i)=>x.fillText(ln,W/2,590+i*50));
+  // date
+  x.fillStyle='#6b7688'; x.font='28px Georgia,serif';
+  x.fillText('Date: '+new Date().toLocaleDateString(),W/2,800);
+  // decorative flowers
+  x.font='60px serif'; x.fillText('🌸  🌻  🌷  🌼  🌹',W/2,920);
+  // AFSR
+  x.fillStyle='#1f3a5f'; x.font='bold 60px Arial'; x.fillText('AFSR',W/2,1080);
+  x.fillStyle='#6b7688'; x.font='24px Arial'; x.fillText('Little Learners. Brighter Tomorrows.',W/2,1130);
+  x.fillStyle='#6b7688'; x.font='22px Georgia,serif'; x.fillText('Big Skills for Little Ones',W/2,1200);
+  return c;
+}
+function saveCertImage(){
+  try{
+    const c=buildCertCanvas();
+    const url=c.toDataURL('image/png');
+    const a=document.createElement('a');
+    a.href=url; a.download='My-Big-Skills-Certificate.png';
+    document.body.appendChild(a); a.click(); a.remove();
+    const m=document.getElementById('saveMsg'); if(m){ m.textContent='✓ Saved as a picture — check your Downloads/Photos'; setTimeout(()=>{if(m)m.textContent='';},3000); }
+  }catch(e){ alert('Could not save on this browser — try Chrome or Safari.'); }
+}
+async function shareCert(){
+  try{
+    const c=buildCertCanvas();
+    c.toBlob(async(blob)=>{
+      const file=new File([blob],'My-Big-Skills-Certificate.png',{type:'image/png'});
+      if(navigator.canShare && navigator.canShare({files:[file]})){
+        try{ await navigator.share({files:[file], title:'My Big Skills Certificate'}); }
+        catch(e){ /* user cancelled */ }
+      } else {
+        saveCertImage();
+        alert('Sharing isn\u2019t available here, so the certificate was saved as a picture you can share yourself. 🌟');
+      }
+    },'image/png');
+  }catch(e){ saveCertImage(); }
+}
+
+/* ---------------- PARENTAL GATE ---------------- */
+let gateAns=0;
+function parentGate(){
+  const a=Math.floor(Math.random()*5)+2, b=Math.floor(Math.random()*5)+2;
+  gateAns=a+b;
+  document.getElementById('gateQ').textContent=a+' + '+b+' = ?';
+  document.getElementById('gateA').value='';
+  document.getElementById('gate').classList.add('show');
+  setTimeout(()=>document.getElementById('gateA').focus(),100);
+}
+function checkGate(){
+  if(parseInt(document.getElementById('gateA').value,10)===gateAns){ closeGate(); go('parent'); }
+  else { document.getElementById('gateA').value=''; document.getElementById('gateA').placeholder='try again'; }
+}
+function closeGate(){ document.getElementById('gate').classList.remove('show'); }
+
+function resetProgress(){ if(confirm('Reset all demo progress?')){ done={}; save(); go('home'); } }
+
+/* init */
+renderHome();
+</script>
+</body>
+</html>
